@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { EmailDto } from './dto/request/email.dto';
-import { NullResponseDto } from './dto/response/null-response.dto';
+
 import { RankGuard } from 'src/common/guard/auth.guard';
 import { Rank } from 'src/common/decorator/rank.decorator';
 import { EmailCheckDto } from './dto/request/email-check.dto';
+import { NullResponseDto } from 'src/common/dto/null-response.dto';
 
 @Controller('account/verify-email')
 export class EmailController {

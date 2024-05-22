@@ -15,7 +15,7 @@ import { UserWithStatus } from './dto/response/user-data.dto';
 import { User } from '../auth/model/user.model';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UpdatePwDto } from './dto/request/update-pw.dto';
-import { NullResponseDto } from './dto/response/null-response.dto';
+import { NullResponseDto } from 'src/common/dto/null-response.dto';
 
 @Controller('account')
 export class AccountController {
