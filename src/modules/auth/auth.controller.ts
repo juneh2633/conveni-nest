@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -21,6 +23,9 @@ import { TokenResponseDto } from './dto/response/token.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { SignUpDto } from './dto/request/sign-up.dto';
 import { NullResponseDto } from './dto/response/null-response.dto';
+import { Rank } from 'src/common/decorator/rank.decorator';
+import { RankGuard } from 'src/common/guard/auth.guard';
+import { User } from './model/user.model';
 
 @ApiTags('Auth API')
 @Controller('account')
@@ -45,6 +50,16 @@ export class AuthController {
   @HttpCode(200)
   async signUp(@Body() signUpDto: SignUpDto): Promise<NullResponseDto> {
     await this.authService.signUp(signUpDto);
+
+    return new NullResponseDto();
+  }
+
+  @Delete('/')
+  @Rank(1)
+  @UseGuards(RankGuard)
+  @HttpCode(201)
+  async withdrawAccount(@Req() user: User): Promise<NullResponseDto> {
+    await this.authService.withdraw(user);
 
     return new NullResponseDto();
   }

@@ -10,6 +10,7 @@ import { SignInDto } from './dto/request/auth.dto';
 import { compareSync, hashSync } from 'bcrypt';
 import { SignUpDto } from './dto/request/sign-up.dto';
 import { RedisCacheService } from 'src/common/redis/redis.service';
+import { User } from './model/user.model';
 @Injectable()
 export class AuthService {
   constructor(
@@ -64,6 +65,16 @@ export class AuthService {
         password: hashSync(signUpDto.password, 1),
         email: signUpDto.nickname,
         nickname: signUpDto.nickname,
+      },
+    });
+  }
+
+  async withdraw(user: User) {
+    const now = Date();
+    await this.prisma.account.update({
+      where: { idx: user.idx },
+      data: {
+        deletedAt: now,
       },
     });
   }
