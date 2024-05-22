@@ -19,6 +19,8 @@ import {
 } from '@nestjs/swagger';
 import { TokenResponseDto } from './dto/response/token.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { SignUpDto } from './dto/request/sign-up.dto';
+import { NullResponseDto } from './dto/response/null-response.dto';
 
 @ApiTags('Auth API')
 @Controller('account')
@@ -37,5 +39,11 @@ export class AuthController {
     return {
       accessToken: `Bearer ${accessToken}`,
     };
+  }
+
+  async signUp(@Body() signUpDto: SignUpDto): Promise<NullResponseDto> {
+    await this.authService.signUp(signUpDto);
+
+    return new NullResponseDto();
   }
 }
