@@ -41,6 +41,8 @@ export class AuthController {
     };
   }
 
+  @Post('/')
+  @HttpCode(200)
   async signUp(@Body() signUpDto: SignUpDto): Promise<NullResponseDto> {
     await this.authService.signUp(signUpDto);
 
