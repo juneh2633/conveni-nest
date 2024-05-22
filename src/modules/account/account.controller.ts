@@ -1,10 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
-  Query,
-  Req,
-  Request,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
@@ -15,6 +14,8 @@ import { Rank } from 'src/common/decorator/rank.decorator';
 import { UserWithStatus } from './dto/response/user-data.dto';
 import { User } from '../auth/model/user.model';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
+import { UpdatePwDto } from './dto/request/update-pw.dto';
+import { NullResponseDto } from './dto/response/null-response.dto';
 
 @Controller('account')
 export class AccountController {
@@ -30,5 +31,21 @@ export class AccountController {
       data: user,
       authStatus: 'true',
     };
+  }
+
+  @Put('/pw')
+  @HttpCode(201)
+  async recoveryPw(@Body() updatePwDto: UpdatePwDto): Promise<NullResponseDto> {
+    await this.accountService.updatePw(updatePwDto.email, updatePwDto.pw);
+    return new NullResponseDto();
+  }
+
+  @Put('/pw/login')
+  @HttpCode(201)
+  async recoveryPwLogin(
+    @Body() updatePwDto: UpdatePwDto,
+  ): Promise<NullResponseDto> {
+    await this.accountService.updatePw(updatePwDto.email, updatePwDto.pw);
+    return new NullResponseDto();
   }
 }
