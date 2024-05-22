@@ -1,6 +1,6 @@
-import { Payload } from 'src/modules/auth/model/payload.model';
+import { User } from 'src/modules/auth/model/user.model';
 
 export class UserWithStatus {
-  data: Payload;
+  data: User;
   authStatus: 'true' | 'false' | 'expired';
 }

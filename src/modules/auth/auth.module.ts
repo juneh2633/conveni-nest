@@ -8,6 +8,7 @@ import { PrismaModule } from 'src/common/prisma/prisma.module';
 import jwtConfig from './config/jwt.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TokenService } from './token.service';
+import { RedisModule } from 'src/common/redis/redis.module';
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { TokenService } from './token.service';
       inject: [ConfigService],
     }),
     PrismaModule,
+    RedisModule,
   ],
   providers: [AuthService, TokenService],
   controllers: [AuthController],

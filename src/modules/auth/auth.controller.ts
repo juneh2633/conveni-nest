@@ -26,6 +26,7 @@ import { NullResponseDto } from './dto/response/null-response.dto';
 import { Rank } from 'src/common/decorator/rank.decorator';
 import { RankGuard } from 'src/common/guard/auth.guard';
 import { User } from './model/user.model';
+import { GetUser } from 'src/common/decorator/get-user.decorator';
 
 @ApiTags('Auth API')
 @Controller('account')
@@ -58,7 +59,7 @@ export class AuthController {
   @Rank(1)
   @UseGuards(RankGuard)
   @HttpCode(201)
-  async withdrawAccount(@Req() user: User): Promise<NullResponseDto> {
+  async withdrawAccount(@GetUser() user: User): Promise<NullResponseDto> {
     await this.authService.withdraw(user);
 
     return new NullResponseDto();
