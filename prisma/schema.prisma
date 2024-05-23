@@ -8,27 +8,28 @@ datasource db {
 }
 
 model Account {
-  idx        Int        @id @default(autoincrement())
-  password   String     @db.VarChar
-  deletedAt DateTime?  @db.Timestamp(6) @map("deleted_at")
-  createdAt DateTime   @default(now()) @db.Timestamptz(6) @map("created_at")
-  email      String     @db.VarChar
-  nickname   String     @db.VarChar
+  idx       Int        @id @default(autoincrement())
+  password  String     @db.VarChar
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamp(6)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  email     String     @db.VarChar
+  nickname  String     @db.VarChar
   rankIdx   Int        @default(1) @map("rank_idx")
-  rank       Rank       @relation(fields: [rankIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_rank_to_account")
-  bookmark   Bookmark[]
-  review     Review[]
+  rank      Rank       @relation(fields: [rankIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_rank_to_account")
+  bookmark  Bookmark[]
+  review    Review[]
 
   @@map("account")
 }
 
 model Bookmark {
   idx         Int      @id @default(autoincrement())
-  accountIdx  Int      @default(autoincrement()) @map("accountIdx")
+  accountIdx Int      @default(autoincrement())@map("account_idx")
   productIdx  Int      @default(autoincrement()) @map("product_idx")
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)@map("created_at")
   account     Account  @relation(fields: [accountIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_to_bookmark")
   product     Product  @relation(fields: [productIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_to_bookmark")
+
   @@map("bookmark")
 }
 
@@ -36,50 +37,47 @@ model Category {
   idx     Int       @id @default(autoincrement())
   name    String?   @db.VarChar
   product Product[]
+
   @@map("category")
 }
 
-model Company {
-  idx           Int             @id @default(autoincrement())
-  name          String          @db.VarChar
-  eventHistory EventHistory[]
-  @@map("comany")
-}
-
 model Event {
-  idx           Int             @id @default(autoincrement())
-  type          String          @db.VarChar
-  priority      Int
+  idx          Int            @id @default(autoincrement())
+  type         String         @db.VarChar
+  priority     Int
   eventHistory EventHistory[]
+
   @@map("event")
 }
 
 model EventHistory {
-  idx         Int      @id @default(autoincrement())
-  companyIdx  Int      @default(autoincrement()) @map("company_idx")
-  productIdx  Int      @default(autoincrement())@map("product_idx")
-  eventIdx    Int      @default(autoincrement()) @map("event_idx")
-  start_date  DateTime @db.Date
-  price       String?  @db.VarChar
-  company     Company  @relation(fields: [companyIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_company_to_event_history")
-  event       Event    @relation(fields: [eventIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_to_event_history")
-  product     Product  @relation(fields: [productIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_to_event_history")
+  idx        Int      @id @default(autoincrement())
+  companyIdx Int      @default(autoincrement()) @map("company_idx")
+  productIdx Int      @default(autoincrement()) @map("product_idx")
+  eventIdx   Int      @default(autoincrement()) @map("event_idx")
+  startDate  DateTime @map("start_date") @db.Date
+  price      String?  @db.VarChar
+  company    company  @relation(fields: [companyIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_company_to_event_history")
+  event      Event    @relation(fields: [eventIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_event_to_event_history")
+  product    Product  @relation(fields: [productIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_to_event_history")
+
   @@map("event_history")
 }
 
 model Product {
-  idx           Int             @id @default(autoincrement())
-  categoryIdx  Int             @default(autoincrement()) @map("category_idx")
-  name          String          @db.VarChar
-  price         String          @db.VarChar
-  productImg     String          @db.VarChar @map("image_url")
-  deletedAt    DateTime?       @db.Timestamp(6) @map("deleted_at")
-  score         Decimal?        @db.Decimal(3, 2)
-  createdAt    DateTime        @default(now()) @db.Timestamptz(6) @map("created_at")
-  bookmark      Bookmark[]
+  idx          Int            @id @default(autoincrement())
+  categoryIdx  Int            @default(autoincrement()) @map("category_idx")
+  name         String         @db.VarChar
+  price        String         @db.VarChar
+  productImg   String         @map("image_url") @db.VarChar
+  deletedAt    DateTime?      @map("deleted_at") @db.Timestamp(6)
+  score        Decimal?       @db.Decimal(3, 2)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  bookmark     Bookmark[]
   eventHistory EventHistory[]
-  category      Category        @relation(fields: [categoryIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_category_to_product")
-  review        Review[]
+  category     Category       @relation(fields: [categoryIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_category_to_product")
+  review       Review[]
+
   @@map("product")
 }
 
@@ -87,17 +85,25 @@ model Rank {
   idx     Int       @id @default(autoincrement())
   type    String    @db.VarChar
   account Account[]
+
   @@map("rank")
 }
 
 model Review {
-  idx         Int      @id @default(autoincrement())
-  productIdx  Int      @default(autoincrement()) @map("product_idx")
-  accountIdx  Int      @default(autoincrement()) @map("account_idx")
-  content     String?
-  score       Int
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  account     Account  @relation(fields: [accountIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_to_review")
-  product     Product  @relation(fields: [productIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_to_review")
+  idx        Int      @id @default(autoincrement())
+  productIdx Int      @default(autoincrement()) @map("product_idx")
+  accountIdx Int      @default(autoincrement()) @map("account_idx")
+  content    String?
+  score      Int
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  account    Account  @relation(fields: [accountIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_to_review")
+  product    Product  @relation(fields: [productIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_to_review")
+
   @@map("review")
+}
+
+model company {
+  idx          Int            @id @default(autoincrement())
+  name         String         @db.VarChar
+  eventHistory EventHistory[]
 }
