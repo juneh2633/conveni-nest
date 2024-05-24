@@ -26,7 +26,7 @@ export class ProductService {
     filter: Filter = {},
   ): Promise<ProductWithEventHistoryDto> {
     const possibleProductList =
-      await this.productRepository.selectPossibleProductList(
+      await this.productRepository.selectPossibleProductIdxByEventFilter(
         filter.eventFilter,
       );
 

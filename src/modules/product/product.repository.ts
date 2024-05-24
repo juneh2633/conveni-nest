@@ -8,7 +8,7 @@ import { Product } from './model/product.model';
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async selectPossibleProductList(
+  async selectPossibleProductIdxByEventFilter(
     eventFilter: Array<number>,
   ): Promise<Array<PossibleProductIdx>> {
     return this.prisma.eventHistory.findMany({
