@@ -1,9 +1,10 @@
 import { User } from 'src/modules/auth/model/user.model';
 import { ProductWithEventHistoryDto } from '../product-with-event-history.dto';
+import { ProductWithEvent } from '../../model/product-with-event.model';
 
 export class ProductManyDto {
-  data: any;
-  authStatus: any;
+  data: Array<ProductWithEvent>;
+  authStatus: string;
   rankIdx: number;
   constructor(datas: Partial<ProductManyDto>) {
     Object.assign(this, datas);
@@ -11,9 +12,8 @@ export class ProductManyDto {
 
   static createResponse(
     user: User,
-    productWithEventHistoryDto: ProductWithEventHistoryDto,
+    data: Array<ProductWithEvent>,
   ): ProductManyDto {
-    const { productList, eventList } = productWithEventHistoryDto;
     let authStatus = 'true';
     if (user.rankIdx === -1) {
       authStatus = 'expired';
@@ -21,25 +21,9 @@ export class ProductManyDto {
     if (user.rankIdx === 0) {
       authStatus = 'false';
     }
-    const eventMap = eventList.reduce((acc, event) => {
-      if (!acc[event.productIdx]) {
-        acc[event.productIdx] = [];
-      }
-      acc[event.productIdx].push({
-        companyIdx: event.companyIdx,
-        eventIdx: event.eventIdx,
-        price: event.price,
-      });
-      return acc;
-    }, {});
-
-    const productData = productList.map((product) => ({
-      ...product,
-      events: eventMap[product.idx] || [],
-    }));
 
     return new ProductManyDto({
-      data: { productList: productData },
+      data: data,
       authStatus: authStatus,
       rankIdx: user.rankIdx,
     });

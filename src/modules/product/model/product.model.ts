@@ -9,7 +9,7 @@ export class Product {
   name: string;
   price: string;
   productImg: string;
-  bookmark: Array<objectIdx>;
+  bookmarked: boolean;
   score: Decimal;
   createdAt: Date;
 }
