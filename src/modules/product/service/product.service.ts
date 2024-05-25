@@ -30,8 +30,8 @@ export class ProductService {
     page: number,
     accountIdx: number,
     possibleProductList?: Array<PossibleProductIdx>,
-    limit: number = 10,
     filter: Filter = {},
+    limit: number = 10,
   ): Promise<Array<Product>> {
     return await this.productRepository.selectProductAll({
       keyword: filter.keyword,

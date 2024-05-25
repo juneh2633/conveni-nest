@@ -7,6 +7,7 @@ import { Rank } from 'src/common/decorator/rank.decorator';
 import { ProductManyDto } from './dto/response/product-many.dto';
 import { GetProductsPagebleDto } from './dto/request/get-products-pageble.dto';
 import { ProductFacade } from './product.facade';
+import { GetProductsBySearchDto } from './dto/request/get-products-by-search.dto';
 
 @Controller('product')
 export class ProductController {
@@ -20,6 +21,20 @@ export class ProductController {
     @Query() pagerbleDto: GetProductsPagebleDto,
   ): Promise<ProductManyDto> {
     const productList = await this.productFacade.productAll(user, pagerbleDto);
+    return ProductManyDto.createResponse(user, productList);
+  }
+
+  @Get('/search')
+  @Rank(0)
+  @UseGuards(RankGuard)
+  async searchProduct(
+    @GetUser() user: User,
+    @Query() getProductsBySearchDto: GetProductsBySearchDto,
+  ): Promise<ProductManyDto> {
+    const productList = await this.productFacade.productAllBySearch(
+      user,
+      getProductsBySearchDto,
+    );
     return ProductManyDto.createResponse(user, productList);
   }
 }
