@@ -3,33 +3,11 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { PossibleProductIdx } from './model/possible-product-idx.model';
 import { SelectProductAllDao } from './dao/select-product-all.dao';
 import { Product } from './model/product.model';
+import { User } from '../auth/model/user.model';
 
 @Injectable()
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
-
-  async selectPossibleProductIdxByEventFilter(
-    eventFilter: Array<number>,
-  ): Promise<Array<PossibleProductIdx>> {
-    return this.prisma.eventHistory.findMany({
-      select: {
-        idx: true,
-      },
-      where: {
-        eventIdx:
-          eventFilter && eventFilter.length > 0
-            ? {
-                in: eventFilter,
-              }
-            : undefined,
-        startDate: {
-          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
-        },
-      },
-      distinct: ['productIdx'],
-    });
-  }
 
   async selectProductAll(
     selectProductAllDao: SelectProductAllDao,
@@ -74,6 +52,8 @@ export class ProductRepository {
       take: selectProductAllDao.limit,
     });
   }
+
+  select;
 }
 
 //eventIdx: eventFilter[0]

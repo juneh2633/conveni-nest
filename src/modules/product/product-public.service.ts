@@ -15,7 +15,7 @@ interface Filter {
 }
 
 @Injectable()
-export class ProductService {
+export class ProductPublicService {
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly eventRepository: EventRepository,
@@ -26,7 +26,7 @@ export class ProductService {
     filter: Filter = {},
   ): Promise<ProductWithEventHistoryDto> {
     const possibleProductList =
-      await this.productRepository.selectPossibleProductIdxByEventFilter(
+      await this.eventRepository.selectPossibleProductIdxByEventFilter(
         filter.eventFilter,
       );
 

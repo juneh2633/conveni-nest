@@ -6,6 +6,28 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class EventRepository {
   constructor(private readonly prisma: PrismaService) {}
+  async selectPossibleProductIdxByEventFilter(
+    eventFilter: Array<number>,
+  ): Promise<Array<PossibleProductIdx>> {
+    return this.prisma.eventHistory.findMany({
+      select: {
+        idx: true,
+      },
+      where: {
+        eventIdx:
+          eventFilter && eventFilter.length > 0
+            ? {
+                in: eventFilter,
+              }
+            : undefined,
+        startDate: {
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+        },
+      },
+      distinct: ['productIdx'],
+    });
+  }
 
   async selectEventInfo(
     possibleProductList: Array<PossibleProductIdx>,
@@ -76,16 +98,7 @@ export class EventRepository {
       ],
     });
   }
-  // await this.prisma.eventHistory.createMany({
-  //   data: insertEventDao.eventInfo
-  //     .filter((event) => event)
-  //     .map((event) => ({
-  //       startDate: new Date(),
-  //       productIdx: insertEventDao.productIdx,
-  //       companyIdx: event.companyIdx,
-  //       eventIdx: event.eventIdx,
-  //       price: event.price ? event.price : null,
-  //     }))
+
   async deleteEvent(productIdx: number): Promise<void> {
     await this.prisma.eventHistory.deleteMany({
       where: {

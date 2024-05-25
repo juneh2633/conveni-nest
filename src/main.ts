@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { PrismaService } from './common/prisma/prisma.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { HttpErrorFilter } from './common/filter/HttpErrorFilter';
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
+  app.useGlobalFilters(new HttpErrorFilter());
   const config = new DocumentBuilder()
     .setTitle('convenii')
     .setDescription('apis')
