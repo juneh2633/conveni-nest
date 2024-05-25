@@ -1,8 +1,9 @@
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { PossibleProductIdx } from './model/possible-product-idx.model';
-import { EventHistory } from './model/event-history.model';
-import { InsertEventDao } from './dao/insert-event.dao';
+
 import { Injectable } from '@nestjs/common';
+import { PossibleProductIdx } from '../model/possible-product-idx.model';
+import { EventHistory } from '../model/event-history.model';
+import { InsertEventDao } from '../dao/insert-event.dao';
 @Injectable()
 export class EventRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -30,11 +31,9 @@ export class EventRepository {
   }
 
   async selectEventInfo(
-    possibleProductList: Array<PossibleProductIdx>,
+    possibleProductIdxArray?: Array<number>,
     month: number = 0,
   ): Promise<Array<EventHistory>> {
-    const possibleProductIdxArray = possibleProductList.map((item) => item.idx);
-
     return await this.prisma.eventHistory.findMany({
       select: {
         productIdx: true,
@@ -45,7 +44,10 @@ export class EventRepository {
       },
       where: {
         productIdx: {
-          in: possibleProductIdxArray,
+          in:
+            possibleProductIdxArray && possibleProductIdxArray.length > 0
+              ? possibleProductIdxArray
+              : undefined,
         },
         startDate: {
           gte: new Date(

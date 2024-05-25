@@ -1,7 +1,6 @@
-export class EventHistory {
+import { Event } from './event.model';
+
+export class EventHistory extends Event {
   productIdx: number;
   startDate: Date;
-  companyIdx: number;
-  eventIdx: number;
-  price: string;
 }
