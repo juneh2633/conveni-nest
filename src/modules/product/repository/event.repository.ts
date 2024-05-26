@@ -7,6 +7,7 @@ import { InsertEventDao } from '../dao/insert-event.dao';
 @Injectable()
 export class EventRepository {
   constructor(private readonly prisma: PrismaService) {}
+
   async selectPossibleProductIdxByEventFilter(
     eventFilter: Array<number>,
   ): Promise<Array<PossibleProductIdx>> {

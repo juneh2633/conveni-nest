@@ -64,6 +64,34 @@ export class ProductRepository {
         })),
       );
   }
+
+  async selectProductByIdx(
+    productIdx: number,
+    accountIdx: number,
+  ): Promise<Product> {
+    return this.prisma.product.findUnique({
+      where: {
+        idx: productIdx,
+      },
+      select: {
+        idx: true,
+        categoryIdx: true,
+        name: true,
+        price: true,
+        productImg: true,
+        score: true,
+        createdAt: true,
+        bookmark: {
+          select: {
+            idx: true,
+          },
+          where: {
+            accountIdx: accountIdx,
+          },
+        },
+      },
+    })[0];
+  }
 }
 
 //eventIdx: eventFilter[0]

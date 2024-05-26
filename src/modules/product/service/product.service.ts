@@ -4,6 +4,7 @@ import { PossibleProductIdx } from '../model/possible-product-idx.model';
 import { Product } from '../model/product.model';
 import { ProductRepository } from '../repository/product.repository';
 import { EventRepository } from '../repository/event.repository';
+import { User } from 'src/modules/auth/model/user.model';
 
 interface Filter {
   keyword?: string;
@@ -41,6 +42,13 @@ export class ProductService {
       limit: limit,
       accountIdx: accountIdx,
     });
+  }
+
+  async getProductByIdx(productIdx: number, user: User): Promise<Product> {
+    return await this.productRepository.selectProductByIdx(
+      productIdx,
+      user.idx,
+    );
   }
 }
 //eventIdx: eventFilter[0]

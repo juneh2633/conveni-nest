@@ -10,11 +10,12 @@ export class EventService {
 
   async getEventList(
     possibleProductList?: Array<PossibleProductIdx>,
+    month: number = 0,
   ): Promise<Array<EventHistory>> {
     const possibleProductIdxArray = possibleProductList?.map(
       (item) => item.idx,
     );
 
-    return this.eventRepository.selectEventInfo(possibleProductIdxArray);
+    return this.eventRepository.selectEventInfo(possibleProductIdxArray, month);
   }
 }
