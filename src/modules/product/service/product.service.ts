@@ -50,6 +50,17 @@ export class ProductService {
       user.idx,
     );
   }
+
+  async getCachedMainProductIdxList(
+    companyIdx: number,
+    option: string,
+  ): Promise<Array<PossibleProductIdx>> {
+    const productArray = await this.productRepository.selectCachedProductIdx(
+      companyIdx,
+      option,
+    );
+    return productArray.map((idx) => {
+      return { idx: idx };
+    });
+  }
 }
-//eventIdx: eventFilter[0]
-//TypeError: Cannot read properties of undefined (reading '0')

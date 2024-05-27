@@ -9,6 +9,7 @@ import { GetProductsPagebleDto } from './dto/request/get-products-pageble.dto';
 import { ProductFacade } from './product.facade';
 import { GetProductsBySearchDto } from './dto/request/get-products-by-search.dto';
 import { ProductWithAuthDto } from './dto/response/product-with-auth.dto';
+import { GetProductsByCompanyDto } from './dto/request/get-products-by-company.dto';
 
 @Controller('product')
 export class ProductController {
@@ -35,6 +36,23 @@ export class ProductController {
     const productList = await this.productFacade.productAllBySearch(
       user,
       getProductsBySearchDto,
+    );
+    return ProductWithAuthDto.createResponse(user, productList);
+  }
+
+  @Get('/company/:companyIdx')
+  @Rank(0)
+  @UseGuards(RankGuard)
+  async findProductListByCompany(
+    @GetUser() user: User,
+    @Query() getProductsByCompanyDto: GetProductsByCompanyDto,
+    @Param() companyIdx: number,
+  ): Promise<ProductWithAuthDto> {
+    const productList = await this.productFacade.productAllByCompany(
+      user,
+      companyIdx,
+      getProductsByCompanyDto.page,
+      getProductsByCompanyDto.option,
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }

@@ -55,6 +55,26 @@ export class ProductFacade {
 
     return this.productWrapper(productList, eventList);
   }
+  async productAllByCompany(
+    user: User,
+    companyIdx: number,
+    page: number,
+    option: string,
+  ) {
+    const possibleProductIdxList =
+      await this.productService.getCachedMainProductIdxList(companyIdx, option);
+
+    const [productList, eventList] = await Promise.all([
+      this.productService.getProductMany(
+        page,
+        user.idx,
+        possibleProductIdxList,
+      ),
+      this.eventService.getEventList(possibleProductIdxList),
+    ]);
+
+    return this.productWrapper(productList, eventList);
+  }
 
   async productByIdx(productIdx: number, user: User) {
     const [product, event] = await Promise.all([
@@ -112,7 +132,7 @@ export class ProductFacade {
     });
     const eventInfo = Object.keys(eventMap).map((monthKey) => {
       return {
-        month: new Date(monthKey + '-01'), // 'YYYY-MM' 형식을 Date 객체로 변환
+        month: new Date(monthKey + '-01'),
         events: eventMap[monthKey].map((evt) => ({
           companyIdx: evt.companyIdx,
           eventIdx: evt.eventIdx,

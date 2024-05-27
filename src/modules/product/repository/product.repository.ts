@@ -2,10 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SelectProductAllDao } from '../dao/select-product-all.dao';
 import { Product } from '../model/product.model';
+import { RedisCacheService } from 'src/common/redis/redis.service';
+import { PossibleProductIdx } from '../model/possible-product-idx.model';
 
 @Injectable()
 export class ProductRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisCacheService,
+  ) {}
 
   async selectProductAll(
     selectProductAllDao: SelectProductAllDao,
@@ -91,6 +96,16 @@ export class ProductRepository {
         },
       },
     })[0];
+  }
+
+  async selectCachedProductIdx(
+    companyIdx: number,
+    option: string,
+  ): Promise<Array<number>> {
+    const data = await this.redis.get(
+      `mainProductsAt${companyIdx}Option:${option}`,
+    );
+    return data ? JSON.parse(data) : [];
   }
 }
 
