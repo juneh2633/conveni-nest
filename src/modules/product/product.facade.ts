@@ -7,16 +7,23 @@ import { Product } from './model/product.model';
 import { EventHistory } from './model/event-history.model';
 import { ProductWithEvent } from './model/product-with-event.model';
 import { GetProductsBySearchDto } from './dto/request/get-products-by-search.dto';
-import { PossibleProductIdx } from './model/possible-product-idx.model';
+
 import { ProductWithManyEvent } from './model/product-with-many-event.model';
+import { AwsService } from 'src/common/aws/aws.service';
+import { CreateProductDto } from './dto/request/create-product-dto';
+import { PrismaService } from 'src/common/prisma/prisma.service';
+import { TransactionalService } from './service/transactional.service';
 @Injectable()
 export class ProductFacade {
   constructor(
     private readonly productService: ProductService,
+    private readonly transactionalService: TransactionalService,
     private readonly eventService: EventService,
+    private readonly awsService: AwsService,
+    private readonly prismaService: PrismaService,
   ) {}
 
-  async productAll(
+  async findProductAll(
     user: User,
     pagerbleDto: GetProductsPagebleDto,
   ): Promise<Array<ProductWithEvent>> {
@@ -28,7 +35,7 @@ export class ProductFacade {
     return this.productWrapper(productList, eventList);
   }
 
-  async productAllBySearch(
+  async findProductAllBySearch(
     user: User,
     getProductsBySearchDto: GetProductsBySearchDto,
   ): Promise<Array<ProductWithEvent>> {
@@ -55,7 +62,8 @@ export class ProductFacade {
 
     return this.productWrapper(productList, eventList);
   }
-  async productAllByCompany(
+
+  async findProductAllByCompany(
     user: User,
     companyIdx: number,
     page: number,
@@ -76,7 +84,7 @@ export class ProductFacade {
     return this.productWrapper(productList, eventList);
   }
 
-  async productByIdx(productIdx: number, user: User) {
+  async findProductByIdx(productIdx: number, user: User) {
     const [product, event] = await Promise.all([
       this.productService.getProductByIdx(productIdx, user),
       this.eventService.getEventList([{ idx: productIdx }], 9),
@@ -84,6 +92,35 @@ export class ProductFacade {
     return this.productWithManyEventWrapper(product, event);
   }
 
+  async createProductOne(
+    file: Express.Multer.File,
+    createProductDto: CreateProductDto,
+  ): Promise<void> {
+    return this.prismaService.$transaction(async (prisma) => {
+      const url = await this.awsService.uploadImage(file);
+      const { eventInfo } = createProductDto;
+      const productIdx = await this.transactionalService.inputProduct(
+        createProductDto.categoryIdx,
+        createProductDto.price,
+        createProductDto.name,
+        prisma,
+        url,
+      );
+      const eventPromises = eventInfo.map((obj) =>
+        this.transactionalService.inputEvent(
+          productIdx,
+          obj.companyIdx,
+          obj.eventIdx,
+          obj.eventPrice,
+          prisma,
+        ),
+      );
+
+      await Promise.all(eventPromises);
+    });
+  }
+
+  // method
   productWrapper(
     productList: Array<Product>,
     eventList: Array<EventHistory>,
