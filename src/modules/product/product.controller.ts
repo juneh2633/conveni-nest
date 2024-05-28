@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UploadedFile,
@@ -25,7 +26,7 @@ import { GetProductsByCompanyDto } from './dto/request/get-products-by-company.d
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerConfig } from 'src/common/aws/config/multer.config';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
-import { CreateProductDto } from './dto/request/create-product-dto';
+import { UpsertProductDto } from './dto/request/upsert-product-dto';
 
 @Controller('product')
 export class ProductController {
@@ -91,9 +92,22 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('image', multerConfig))
   async createProduct(
     @UploadedFile() file: Express.Multer.File,
-    @Body() createProductDto: CreateProductDto,
+    @Body() upsertProductDto: UpsertProductDto,
   ): Promise<NullResponseDto> {
-    await this.productFacade.createProductOne(file, createProductDto);
+    await this.productFacade.createProductOne(file, upsertProductDto);
+
+    return new NullResponseDto();
+  }
+  @Put('/:productIdx')
+  @Rank(2)
+  @UseGuards(RankGuard)
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  async updateProduct(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() upsertProductDto: UpsertProductDto,
+    @Param() productIdx: number,
+  ): Promise<NullResponseDto> {
+    await this.productFacade.amendProduct(file, productIdx, upsertProductDto);
 
     return new NullResponseDto();
   }

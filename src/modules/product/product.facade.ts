@@ -10,7 +10,7 @@ import { GetProductsBySearchDto } from './dto/request/get-products-by-search.dto
 
 import { ProductWithManyEvent } from './model/product-with-many-event.model';
 import { AwsService } from 'src/common/aws/aws.service';
-import { CreateProductDto } from './dto/request/create-product-dto';
+import { UpsertProductDto } from './dto/request/upsert-product-dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { TransactionalService } from './service/transactional.service';
 @Injectable()
@@ -94,15 +94,15 @@ export class ProductFacade {
 
   async createProductOne(
     file: Express.Multer.File,
-    createProductDto: CreateProductDto,
+    upsertProductDto: UpsertProductDto,
   ): Promise<void> {
-    return this.prismaService.$transaction(async (prisma) => {
+    this.prismaService.$transaction(async (prisma) => {
       const url = await this.awsService.uploadImage(file);
-      const { eventInfo } = createProductDto;
+      const { eventInfo } = upsertProductDto;
       const productIdx = await this.transactionalService.inputProduct(
-        createProductDto.categoryIdx,
-        createProductDto.price,
-        createProductDto.name,
+        upsertProductDto.categoryIdx,
+        upsertProductDto.price,
+        upsertProductDto.name,
         prisma,
         url,
       );
@@ -119,7 +119,37 @@ export class ProductFacade {
       await Promise.all(eventPromises);
     });
   }
+  async amendProduct(
+    file: Express.Multer.File,
+    productIdx: number,
+    upsertProductDto: UpsertProductDto,
+  ): Promise<void> {
+    this.prismaService.$transaction(async (prisma) => {
+      const url = await this.awsService.uploadImage(file);
+      const { eventInfo } = upsertProductDto;
+      await this.transactionalService.deleteEvent(productIdx, prisma);
 
+      const updateProduct = this.transactionalService.updateProduct(
+        productIdx,
+        upsertProductDto.categoryIdx,
+        upsertProductDto.price,
+        upsertProductDto.name,
+        prisma,
+        url,
+      );
+      const eventPromises = eventInfo.map((obj) =>
+        this.transactionalService.inputEvent(
+          productIdx,
+          obj.companyIdx,
+          obj.eventIdx,
+          obj.eventPrice,
+          prisma,
+        ),
+      );
+
+      await Promise.all([...eventPromises, updateProduct]);
+    });
+  }
   // method
   productWrapper(
     productList: Array<Product>,
