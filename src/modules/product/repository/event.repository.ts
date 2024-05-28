@@ -1,7 +1,7 @@
 import { PrismaService } from 'src/common/prisma/prisma.service';
 
 import { Injectable } from '@nestjs/common';
-import { PossibleProductIdx } from '../model/possible-product-idx.model';
+import { Idx } from '../model/possible-product-idx.model';
 import { EventHistory } from '../model/event-history.model';
 import { InsertEventDao } from '../dao/insert-event.dao';
 @Injectable()
@@ -10,7 +10,7 @@ export class EventRepository {
 
   async selectPossibleProductIdxByEventFilter(
     eventFilter: Array<number>,
-  ): Promise<Array<PossibleProductIdx>> {
+  ): Promise<Array<Idx>> {
     return this.prisma.eventHistory.findMany({
       select: {
         idx: true,

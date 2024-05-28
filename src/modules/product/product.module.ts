@@ -8,15 +8,19 @@ import { ProductService } from './service/product.service';
 import { EventService } from './service/event.service';
 import { EventRepository } from './repository/event.repository';
 import { ProductRepository } from './repository/product.repository';
+import { AwsModule } from 'src/common/aws/aws.module';
+
+import { TransactionalService } from './service/transactional.service';
 
 @Module({
-  imports: [RedisModule, PrismaModule],
+  imports: [RedisModule, PrismaModule, AwsModule],
   providers: [
     ProductFacade,
     ProductService,
     EventService,
     EventRepository,
     ProductRepository,
+    TransactionalService,
   ],
   controllers: [ProductController],
 })

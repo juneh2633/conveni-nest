@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { PossibleProductIdx } from '../model/possible-product-idx.model';
 import { Product } from '../model/product.model';
 import { ProductRepository } from '../repository/product.repository';
 import { EventRepository } from '../repository/event.repository';
 import { User } from 'src/modules/auth/model/user.model';
+import { Idx } from '../model/possible-product-idx.model';
 
 interface Filter {
   keyword?: string;
@@ -21,7 +21,7 @@ export class ProductService {
 
   async getPossibleProductByEvent(
     eventFilter: Array<number>,
-  ): Promise<Array<PossibleProductIdx>> {
+  ): Promise<Array<Idx>> {
     return await this.eventRepository.selectPossibleProductIdxByEventFilter(
       eventFilter,
     );
@@ -30,7 +30,7 @@ export class ProductService {
   async getProductMany(
     page: number,
     accountIdx: number,
-    possibleProductList?: Array<PossibleProductIdx>,
+    possibleProductList?: Array<Idx>,
     filter: Filter = {},
     limit: number = 10,
   ): Promise<Array<Product>> {
@@ -54,7 +54,7 @@ export class ProductService {
   async getCachedMainProductIdxList(
     companyIdx: number,
     option: string,
-  ): Promise<Array<PossibleProductIdx>> {
+  ): Promise<Array<Idx>> {
     const productArray = await this.productRepository.selectCachedProductIdx(
       companyIdx,
       option,

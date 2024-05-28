@@ -3,7 +3,6 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SelectProductAllDao } from '../dao/select-product-all.dao';
 import { Product } from '../model/product.model';
 import { RedisCacheService } from 'src/common/redis/redis.service';
-import { PossibleProductIdx } from '../model/possible-product-idx.model';
 
 @Injectable()
 export class ProductRepository {

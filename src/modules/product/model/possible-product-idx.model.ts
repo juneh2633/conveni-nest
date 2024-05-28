@@ -1,3 +1,3 @@
-export class PossibleProductIdx {
+export class Idx {
   idx: number;
 }
