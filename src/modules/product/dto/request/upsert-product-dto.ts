@@ -27,7 +27,7 @@ class Event {
   @Transform(({ value }) => (!value ? null : parseInt(value)))
   eventPrice?: number | null;
 }
-export class CreateProductDto {
+export class UpsertProductDto {
   @IsNumber()
   @Type(() => Number)
   categoryIdx: number;
