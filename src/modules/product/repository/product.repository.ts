@@ -63,7 +63,7 @@ export class ProductRepository {
 
     return products.map((product) => ({
       ...product,
-      bookmarked: product.bookmark.length > 0,
+      bookmarked: product.bookmark?.[0] ? true : false,
       bookmark: undefined,
     }));
   }
