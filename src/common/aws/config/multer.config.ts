@@ -14,3 +14,30 @@ export const multerConfig: MulterOptions = {
     callback(null, true);
   },
 };
+
+export const multerConfigProvider = (
+  fileType: 'img' | 'zip',
+  limit: number = 5 * 1024 * 1024,
+): MulterOptions => {
+  const mimeType = [];
+
+  if (fileType === 'img') {
+    mimeType.push(...['image/jpg', 'image/png']);
+  }
+
+  return {
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: limit,
+    },
+    fileFilter: (req, file, callback) => {
+      if (!mimeType.includes(file.mimetype)) {
+        return callback(
+          new BadRequestException('Unsupported file type'),
+          false,
+        );
+      }
+      callback(null, true);
+    },
+  };
+};

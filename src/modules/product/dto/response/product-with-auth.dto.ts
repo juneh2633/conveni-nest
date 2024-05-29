@@ -9,18 +9,21 @@ export class ProductWithAuthDto {
   }
 
   static createResponse(user: User, data: any): ProductWithAuthDto {
-    let authStatus = 'true';
-    if (user.rankIdx === -1) {
-      authStatus = 'expired';
-    }
-    if (user.rankIdx === 0) {
-      authStatus = 'false';
-    }
-
     return new ProductWithAuthDto({
       data: data,
-      authStatus: authStatus,
+      authStatus: ProductWithAuthDto.setAuthState(user.rankIdx),
       rankIdx: user.rankIdx,
     });
+  }
+
+  private static setAuthState(rankInd: number): 'expired' | 'false' | 'true' {
+    if (rankInd === -1) {
+      return 'expired';
+    }
+    if (rankInd === 0) {
+      return 'false';
+    }
+
+    return 'true';
   }
 }

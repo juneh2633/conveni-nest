@@ -8,5 +8,5 @@ export class GetProductsByCompanyDto {
 
   @IsString()
   @IsIn(['main', 'all'])
-  option: string;
+  option: 'main' | 'all';
 }
