@@ -10,6 +10,7 @@ import { AwsService } from 'src/common/aws/aws.service';
 import { UpsertProductDto } from './dto/request/upsert-product-dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ProductWithEventEntity } from './entity/ProductWithEvent.entity';
+import { ProductWithManyEventEntity } from './entity/productWithManyEvent.entity';
 
 @Injectable()
 // 프로덕트에 대한 비즈니스 로직을 담당 -> 가공까지 이어져야할 일인가?
@@ -84,12 +85,15 @@ export class ProductService {
     return ProductWithEventEntity.create(productList, eventList);
   }
 
-  async findProductByIdx(productIdx: number, user: User) {
+  async findProductByIdx(
+    productIdx: number,
+    user: User,
+  ): Promise<ProductWithManyEventEntity> {
     const [product, event] = await Promise.all([
       this.productRepository.getProductByIdx(productIdx, user.idx),
       this.eventRepository.getEventList([productIdx], 9),
     ]);
-    return this.productWithManyEventWrapper(product, event);
+    return ProductWithManyEventEntity.create(product, event);
   }
 
   async createProductOne(
@@ -151,45 +155,4 @@ export class ProductService {
     });
   }
   async removeProduct(productIdx: number): Promise<void> {}
-
-  // productWithManyEventWrapper(
-  //   product: Product,
-  //   eventList: Array<EventHistory>,
-  // ): ProductWithManyEvent {
-  //   const currentDate = new Date();
-
-  //   const pastDate = new Date();
-  //   pastDate.setMonth(currentDate.getMonth() - 10);
-
-  //   const recentEvents = eventList.filter(
-  //     (event) => event.startDate >= pastDate,
-  //   );
-
-  //   const eventMap: { [key: string]: Array<EventHistory> } = {};
-
-  //   recentEvents.forEach((event) => {
-  //     const monthKey = `${event.startDate.getFullYear()}-${String(event.startDate.getMonth() + 1).padStart(2, '0')}`;
-
-  //     if (!eventMap[monthKey]) {
-  //       eventMap[monthKey] = [];
-  //     }
-
-  //     eventMap[monthKey].push(event);
-  //   });
-  //   const eventInfo = Object.keys(eventMap).map((monthKey) => {
-  //     return {
-  //       month: new Date(monthKey + '-01'),
-  //       events: eventMap[monthKey].map((evt) => ({
-  //         companyIdx: evt.companyIdx,
-  //         eventIdx: evt.eventIdx,
-  //         price: evt.price,
-  //       })),
-  //     };
-  //   });
-
-  //   return {
-  //     product: product,
-  //     eventInfo: eventInfo,
-  //   };
-  // }
 }
