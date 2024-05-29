@@ -11,7 +11,7 @@ export class ProductWithEventEntity {
   bookmarked: boolean;
   score: string;
   createdAt: Date;
-  events: EventHistoryEntity;
+  events: EventHistoryEntity[];
   constructor(data) {
     Object.assign(this, data);
   }
