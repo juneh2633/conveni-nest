@@ -1,5 +1,6 @@
 import { EventHistory } from '@prisma/client';
 import { ProductWithBookmark } from '../model/product-with-bookmark.model';
+import { EventHistoryEntity } from './EventHistory.entity';
 
 export class ProductWithEventEntity {
   idx: number;
@@ -10,7 +11,7 @@ export class ProductWithEventEntity {
   bookmarked: boolean;
   score: string;
   createdAt: Date;
-  events: any;
+  events: EventHistoryEntity;
   constructor(data) {
     Object.assign(this, data);
   }
