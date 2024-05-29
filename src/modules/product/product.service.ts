@@ -154,5 +154,7 @@ export class ProductService {
       await Promise.all([...eventPromises, updateProduct]);
     });
   }
-  async removeProduct(productIdx: number): Promise<void> {}
+  async removeProduct(productIdx: number): Promise<void> {
+    await this.productRepository.deleteProduct(productIdx);
+  }
 }
