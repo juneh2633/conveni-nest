@@ -85,7 +85,9 @@ export class ProductRepository {
         },
       },
     });
-
+    if (!product) {
+      return undefined;
+    }
     return {
       idx: product.idx,
       categoryIdx: product.categoryIdx,
@@ -121,7 +123,7 @@ export class ProductRepository {
     prismaTx: Prisma.TransactionClient,
   ): Promise<number> {
     const prisma = prismaTx ? prismaTx : this.prismaService;
-    return await prisma.product.create({
+    const query = await prisma.product.create({
       data: {
         categoryIdx: categoryIdx,
         price: price.toString(),
@@ -131,7 +133,8 @@ export class ProductRepository {
       select: {
         idx: true,
       },
-    })[0].idx;
+    });
+    return query.idx;
   }
 
   async updateProduct(
