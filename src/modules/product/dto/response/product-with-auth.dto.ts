@@ -1,8 +1,13 @@
 import { User } from 'src/modules/auth/model/user.model';
+import { ProductWithManyEventEntity } from '../../entity/productWithManyEvent.entity';
+import { ProductWithEventEntity } from '../../entity/ProductWithEvent.entity';
 
 export class ProductWithAuthDto {
-  data: any;
-  authStatus: string;
+  data: ProductWithManyEventEntity | ProductWithEventEntity[];
+  authStatus: 'expired' | 'false' | 'true';
+  /**
+   *  asdfasdfa
+   */
   rankIdx: number;
   constructor(datas: any) {
     Object.assign(this, datas);

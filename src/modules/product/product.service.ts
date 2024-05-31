@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EventRepository } from './repository/event.repository';
 import { ProductRepository } from './repository/product.repository';
 import { GetProductsPagebleDto } from './dto/request/get-products-pageble.dto';
@@ -93,6 +97,10 @@ export class ProductService {
       this.productRepository.getProductByIdx(productIdx, user.idx),
       this.eventRepository.getEventList([productIdx], 9),
     ]);
+
+    if (!product) {
+      throw new NotFoundException('no product');
+    }
     return ProductWithManyEventEntity.create(product, event);
   }
 

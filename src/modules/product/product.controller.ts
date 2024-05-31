@@ -1,95 +1,79 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Post,
   Put,
   Query,
-  Req,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
-  applyDecorators,
 } from '@nestjs/common';
-
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { User } from '../auth/model/user.model';
-import { RankGuard } from 'src/common/guard/auth.guard';
-import { Rank } from 'src/common/decorator/rank.decorator';
-
 import { GetProductsPagebleDto } from './dto/request/get-products-pageble.dto';
-
 import { GetProductsBySearchDto } from './dto/request/get-products-by-search.dto';
 import { ProductWithAuthDto } from './dto/response/product-with-auth.dto';
 import { GetProductsByCompanyDto } from './dto/request/get-products-by-company.dto';
-
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  multerConfig,
-  multerConfigProvider,
-} from 'src/common/aws/config/multer.config';
+import { multerConfigProvider } from 'src/common/aws/config/multer.config';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
 import { UpsertProductDto } from './dto/request/upsert-product-dto';
-import { ApiBearerAuth, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import { ProductService } from './product.service';
-
-const AuthCheck = (rank: number) => {
-  return applyDecorators(
-    Rank(rank),
-    UseGuards(RankGuard),
-    ApiBearerAuth(),
-    ApiResponse({ status: 401, description: '토큰 만료' }),
-  );
-};
-
-const Exception = (status: number, description: string) => {
-  return applyDecorators(ApiResponse({ status, description }));
-};
+import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productFacade: ProductService) {}
+  constructor(private readonly productService: ProductService) {}
 
+  /**
+   * 상품 전체 가져오기
+   */
   @Get('/all')
-  @Rank(0)
-  @UseGuards(RankGuard)
+  @AuthCheck(0)
   async findProductList(
     @GetUser() user: User,
     @Query() pagerbleDto: GetProductsPagebleDto,
   ): Promise<ProductWithAuthDto> {
-    const productList = await this.productFacade.findProductAll(
+    const productList = await this.productService.findProductAll(
       user,
       pagerbleDto,
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }
 
+  /**
+   * 상품 검색하기
+   */
   @Get('/search')
-  @Rank(0)
-  @UseGuards(RankGuard)
+  @AuthCheck(0)
   async searchProduct(
     @GetUser() user: User,
     @Query() getProductsBySearchDto: GetProductsBySearchDto,
   ): Promise<ProductWithAuthDto> {
-    const productList = await this.productFacade.findProductAllBySearch(
+    const productList = await this.productService.findProductAllBySearch(
       user,
       getProductsBySearchDto,
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }
-  //
+
+  /**
+   * 회사별 상품 가져오기
+   */
   @Get('/company/:companyIdx')
-  @Rank(0)
-  @UseGuards(RankGuard)
+  @AuthCheck(0)
   async findProductListByCompany(
     @GetUser() user: User,
     @Query() getProductsByCompanyDto: GetProductsByCompanyDto,
-    @Param() companyIdx: number,
+    @Param('companyIdx', ParseIntPipe) companyIdx: number,
   ): Promise<ProductWithAuthDto> {
-    const productList = await this.productFacade.findProductAllByCompany(
+    const productList = await this.productService.findProductAllByCompany(
       user,
       companyIdx,
       getProductsByCompanyDto.page,
@@ -98,54 +82,70 @@ export class ProductController {
     return ProductWithAuthDto.createResponse(user, productList);
   }
 
-  @Get('/:product')
-  @Rank(0)
-  @UseGuards(RankGuard)
+  /**
+   * 상품 상세보기
+   */
+  @Get('/:productIdx')
+  @AuthCheck(0)
   async findProduct(
     @GetUser() user: User,
-    @Param('product', ParseIntPipe) productIdx: number,
+    @Param('productIdx', ParseIntPipe) productIdx: number,
   ) {
-    const product = await this.productFacade.findProductByIdx(productIdx, user);
+    const product = await this.productService.findProductByIdx(
+      productIdx,
+      user,
+    );
 
     return ProductWithAuthDto.createResponse(user, product);
   }
 
+  /**
+   *  상품 추가
+   */
   @Post('/')
-  @Rank(2)
-  @UseGuards(RankGuard)
+  @AuthCheck(2)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image', multerConfigProvider('img')))
   async createProduct(
-    @UploadedFile() file: Express.Multer.File,
     @Body() upsertProductDto: UpsertProductDto,
+    @UploadedFile('file', ParseFilePipe) file?: Express.Multer.File,
   ): Promise<NullResponseDto> {
-    await this.productFacade.createProductOne(file, upsertProductDto);
+    if (!file) {
+      throw new BadRequestException('no file');
+    }
+    await this.productService.createProductOne(file, upsertProductDto);
 
     return new NullResponseDto();
   }
 
+  /**
+   * 상품 수정
+   */
   @Put('/:productIdx')
-  @Rank(2)
-  @UseGuards(RankGuard)
+  @AuthCheck(2)
   @UseInterceptors(FileInterceptor('image', multerConfigProvider('img')))
   async updateProduct(
     @Body() upsertProductDto: UpsertProductDto,
-    @Param() productIdx: number,
+    @Param('productIdx', ParseIntPipe) productIdx: number,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<NullResponseDto> {
     if (!file) {
     }
 
-    await this.productFacade.amendProduct(file, productIdx, upsertProductDto);
+    await this.productService.amendProduct(file, productIdx, upsertProductDto);
 
     return new NullResponseDto();
   }
 
+  /**
+   * 상품 삭제
+   */
   @Delete('/')
   @AuthCheck(2)
-  @Exception(403, '권한 없음')
-  @UseInterceptors(FileInterceptor('image', multerConfig))
-  async deleteProduct(@Param() productIdx: number): Promise<NullResponseDto> {
-    await this.productFacade.removeProduct(productIdx);
+  async deleteProduct(
+    @Param('productIdx', ParseIntPipe) productIdx: number,
+  ): Promise<NullResponseDto> {
+    await this.productService.removeProduct(productIdx);
 
     return new NullResponseDto();
   }
