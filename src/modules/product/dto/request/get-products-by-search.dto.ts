@@ -11,26 +11,16 @@ export class GetProductsBySearchDto {
   page: number;
 
   @IsOptional()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      if (value === '') {
-        return undefined;
-      }
-      return value.replace('{', '').replace('}', '').split(',').map(Number);
-    }
-    return undefined;
-  })
-  eventFilter?: Array<number>;
+  @IsArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : [Number(value)],
+  )
+  eventFilter?: number[];
 
   @IsOptional()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      if (value === '') {
-        return undefined;
-      }
-      return value.replace('{', '').replace('}', '').split(',').map(Number);
-    }
-    return undefined;
-  })
-  categoryFilter?: Array<number>;
+  @IsArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : [Number(value)],
+  )
+  categoryFilter?: number[];
 }
