@@ -32,17 +32,19 @@ export class ProductWithEventEntity {
       return acc;
     }, {});
 
-    return productList.map((product) => {
-      return new ProductWithEventEntity({
-        idx: product.idx,
-        categoryIdx: product.categoryIdx,
-        name: product.name,
-        price: product.price,
-        productImg: product.productImg,
-        bookmarked: product.bookmarked,
-        createdAt: product.createdAt,
-        events: eventMap[product.idx] || [],
-      });
-    });
+    return productList
+      .map((product) => {
+        return new ProductWithEventEntity({
+          idx: product.idx,
+          categoryIdx: product.categoryIdx,
+          name: product.name,
+          price: product.price,
+          productImg: product.productImg,
+          bookmarked: product.bookmarked,
+          createdAt: product.createdAt,
+          events: eventMap[product.idx] || [],
+        });
+      })
+      .filter((product) => product.events[0]);
   }
 }
