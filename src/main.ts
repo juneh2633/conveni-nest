@@ -23,9 +23,9 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpErrorFilter());
   const config = new DocumentBuilder()
     .setTitle('convenii')
-    .setDescription('apis')
-    .setVersion('1.0')
+    .setDescription('convenii api document')
     .addTag('convenii')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
