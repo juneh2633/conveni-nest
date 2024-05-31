@@ -26,18 +26,22 @@ export class RankGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const bearerToken = request.headers.authorization;
 
-    if (!bearerToken && requiredRankIdx !== 0) {
-      throw new UnauthorizedException('No token');
+    let payload;
+    try {
+      if (!bearerToken && requiredRankIdx !== 0) {
+        throw new UnauthorizedException();
+      }
+      payload = bearerToken
+        ? this.tokenService.verifyToken(bearerToken)
+        : this.tokenService.noLoginToken();
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
     }
-
-    const payload = bearerToken
-      ? this.tokenService.verifyToken(bearerToken)
-      : this.tokenService.noLoginToken();
 
     if (payload.rankIdx === -1 && requiredRankIdx > 0) {
       throw new UnauthorizedException('token expired');
     } else if (payload.rankIdx < requiredRankIdx) {
-      throw new UnauthorizedException('No permission');
+      throw new ForbiddenException('No permission');
     }
     request.user = payload;
     return true;
