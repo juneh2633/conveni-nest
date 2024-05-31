@@ -41,12 +41,13 @@ export class ProductWithManyEventEntity {
 
       eventMap[monthKey].push(event);
     });
+
     const eventInfo = [];
-    const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
 
     for (let i = 0; i < 11; i++) {
       const targetDate = new Date();
+      targetDate.setDate(1);
       targetDate.setMonth(currentMonth - 1 - i);
       const targetYear = targetDate.getFullYear();
       const targetMonth = String(targetDate.getMonth() + 1).padStart(2, '0');
