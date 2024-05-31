@@ -1,44 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
-  IsIn,
   IsNumber,
   IsOptional,
   IsString,
-  ValidateIf,
   ValidateNested,
 } from 'class-validator';
-
-class Event {
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  @ApiProperty({
-    description: '회사idx',
-    default: 1,
-  })
-  companyIdx: number;
-
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => (!value ? null : parseInt(value)))
-  @Type(() => Number)
-  @ApiProperty({
-    description: '행사idx',
-    default: 1,
-  })
-  eventIdx: number | null;
-
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => (!value ? null : parseInt(value)))
-  @ApiProperty({
-    description: '할인 행사일 경우 가격',
-    default: null,
-  })
-  eventPrice?: number | null;
-}
+import { EventDto } from './event.dto';
+import { IsEventArray } from 'src/common/decorator/is-event.decorator';
 
 export class UpsertProductDto {
   @IsNumber()
@@ -65,15 +34,22 @@ export class UpsertProductDto {
   price: number;
 
   @IsOptional()
-  @Type(() => Event)
+  @Type(() => EventDto)
+  @IsEventArray({ message: 'eventInfo object error' })
+  @Transform(({ value }) => {
+    return JSON.parse(value);
+  })
   @ApiProperty({
     description: 'event정보',
-    type: [Event],
+    type: [EventDto],
     default: [
       { companyIdx: 1, eventIdx: 1, eventPrice: null },
       { companyIdx: 2, eventIdx: 2, eventPrice: null },
       { companyIdx: 3, eventIdx: 1, eventPrice: null },
     ],
   })
-  eventInfo?: Event[];
+  eventInfo?: EventDto[];
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  image: any;
 }
