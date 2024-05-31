@@ -26,7 +26,7 @@ export class EventRepository {
           : undefined,
         startDate: {
           gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
         },
       },
       distinct: ['productIdx'],
@@ -48,7 +48,7 @@ export class EventRepository {
             new Date().getMonth() - month,
             1,
           ),
-          lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+          lte: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
         },
       },
     });
@@ -65,10 +65,18 @@ export class EventRepository {
     await prisma.eventHistory.create({
       data: {
         startDate: new Date(),
-        productIdx: productIdx,
-        companyIdx: companyIdx,
-        eventIdx: eventIdx,
-        price: !eventPrice ? null : eventPrice.toString(),
+        price: eventPrice ? eventPrice.toString() : null,
+        company: {
+          connect: { idx: companyIdx },
+        },
+        product: {
+          connect: { idx: productIdx },
+        },
+        event: eventIdx
+          ? {
+              connect: { idx: eventIdx },
+            }
+          : undefined,
       },
     });
   }
@@ -83,7 +91,7 @@ export class EventRepository {
         productIdx: productIdx,
         startDate: {
           gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
         },
       },
     });
