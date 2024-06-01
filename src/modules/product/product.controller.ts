@@ -25,8 +25,10 @@ import { NullResponseDto } from 'src/common/dto/null-response.dto';
 import { UpsertProductDto } from './dto/request/upsert-product-dto';
 import { ProductService } from './product.service';
 import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiException } from 'src/common/decorator/api-exception.decorator';
 
+@ApiTags('Product API')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -150,5 +152,3 @@ export class ProductController {
     return new NullResponseDto();
   }
 }
-
-//https://ko.wikipedia.org/wiki/SOLID_(%EA%B0%9D%EC%B2%B4_%EC%A7%80%ED%96%A5_%EC%84%A4%EA%B3%84)

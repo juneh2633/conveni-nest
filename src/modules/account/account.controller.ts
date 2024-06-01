@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { RankGuard } from 'src/common/guard/auth.guard';
 import { Rank } from 'src/common/decorator/rank.decorator';
@@ -17,6 +17,7 @@ import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { UpdatePwDto } from './dto/request/update-pw.dto';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
 
+@ApiTags('Account API')
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
