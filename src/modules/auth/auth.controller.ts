@@ -43,7 +43,7 @@ export class AuthController {
     const accessToken = await this.authService.signIn(signInDto);
 
     return {
-      accessToken: `Bearer ${accessToken}`,
+      accessToken: accessToken,
     };
   }
 

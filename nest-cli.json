@@ -11,6 +11,7 @@
           "classValidatorShim": true,
           "introspectComments": true,
           "controllerKeyOfComment": "summary",
+          "dtoKeyOfComment": "DtoDescription",
           "dtoFileNameSuffix": [".dto.ts", ".entity.ts"]
         }
       }
