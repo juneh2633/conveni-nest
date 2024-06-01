@@ -5,6 +5,7 @@ import { BookmarkModule } from './modules/bookmark/bookmark.module';
 
 import { AccountModule } from './modules/account/account.module';
 import { EmailModule } from './modules/email/email.module';
+import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { EmailModule } from './modules/email/email.module';
     ProductModule,
     BookmarkModule,
     EmailModule,
+    ReviewModule,
   ],
   providers: [],
   controllers: [],
