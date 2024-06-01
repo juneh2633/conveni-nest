@@ -11,12 +11,12 @@ import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ApiException } from './api-exception.decorator';
 
 export const AuthCheck = (rank: number) => {
-  return applyDecorators(
-    Rank(rank),
-    UseGuards(RankGuard),
-    ApiBearerAuth(),
-    ApiException(new UnauthorizedException('token expired')),
-    ApiException(new UnauthorizedException('Invalid token')),
-    ApiException(new ForbiddenException('No permission')),
-  );
+  const decorators = [Rank(rank), UseGuards(RankGuard)];
+  if (rank !== 0) {
+    decorators.push(ApiBearerAuth());
+    decorators.push(ApiException(new UnauthorizedException('token expired')));
+    decorators.push(ApiException(new UnauthorizedException('Invalid token')));
+    decorators.push(ApiException(new ForbiddenException('No permission')));
+  }
+  return applyDecorators(...decorators);
 };
