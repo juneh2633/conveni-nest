@@ -83,6 +83,10 @@ export class ProductController {
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }
+
+  /**
+   * 북마크 되어있는 상품 가져오기
+   */
   @Get('/bookmark')
   @AuthCheck(1)
   async findProductListByBookmark(
