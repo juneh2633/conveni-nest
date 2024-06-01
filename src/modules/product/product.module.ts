@@ -8,9 +8,10 @@ import { AwsModule } from 'src/common/aws/aws.module';
 import { ProductRepository } from './repository/product.repository';
 import { EventRepository } from './repository/event.repository';
 import { ProductService } from './product.service';
+import { BookmarkModule } from '../bookmark/bookmark.module';
 
 @Module({
-  imports: [RedisModule, PrismaModule, AwsModule],
+  imports: [RedisModule, PrismaModule, AwsModule, BookmarkModule],
   providers: [ProductService, ProductRepository, EventRepository],
   controllers: [ProductController],
 })

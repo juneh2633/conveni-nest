@@ -6,7 +6,8 @@ import { BookmarkRepository } from './bookmark.repository';
 
 @Module({
   imports: [PrismaModule],
-  providers: [BookmarkService],
+  providers: [BookmarkService, BookmarkRepository],
   controllers: [BookmarkController],
+  exports: [BookmarkRepository],
 })
 export class BookmarkModule {}

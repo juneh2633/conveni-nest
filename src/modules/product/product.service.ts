@@ -15,11 +15,13 @@ import { UpsertProductDto } from './dto/request/upsert-product-dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ProductWithEventEntity } from './entity/ProductWithEvent.entity';
 import { ProductWithManyEventEntity } from './entity/productWithManyEvent.entity';
+import { BookmarkRepository } from '../bookmark/bookmark.repository';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly productRepository: ProductRepository,
+    private readonly bookmarkRepository: BookmarkRepository,
     private readonly eventRepository: EventRepository,
     private readonly awsService: AwsService,
     private readonly prismaService: PrismaService,
@@ -27,10 +29,10 @@ export class ProductService {
 
   async findProductAll(
     user: User,
-    pagerbleDto: GetProductsPagebleDto,
+    page: number,
   ): Promise<ProductWithEventEntity[]> {
     const [productList, eventList] = await Promise.all([
-      this.productRepository.getProductMany(pagerbleDto.page, user.idx),
+      this.productRepository.getProductMany(page, user.idx),
       this.eventRepository.getEventList(),
     ]);
 
@@ -88,6 +90,17 @@ export class ProductService {
     return ProductWithEventEntity.createMany(productList, eventList);
   }
 
+  async findProductAllByBookmark(user: User, page: number) {
+    const possibleProductIdxList =
+      await this.bookmarkRepository.selectBookmarkAll(user.idx);
+    const productIdxList = possibleProductIdxList.map((obj) => obj.idx);
+    const [productList, eventList] = await Promise.all([
+      this.productRepository.getProductMany(page, user.idx, productIdxList),
+      this.eventRepository.getEventList(productIdxList),
+    ]);
+
+    return ProductWithEventEntity.createMany(productList, eventList);
+  }
   async findProductByIdx(
     productIdx: number,
     user: User,

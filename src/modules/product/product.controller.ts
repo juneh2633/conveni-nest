@@ -44,7 +44,7 @@ export class ProductController {
   ): Promise<ProductWithAuthDto> {
     const productList = await this.productService.findProductAll(
       user,
-      pagerbleDto,
+      pagerbleDto.page,
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }
@@ -83,7 +83,18 @@ export class ProductController {
     );
     return ProductWithAuthDto.createResponse(user, productList);
   }
-
+  @Get('/bookmark')
+  @AuthCheck(1)
+  async findProductListByBookmark(
+    @GetUser() user: User,
+    @Query() getProductsPagebleDto: GetProductsPagebleDto,
+  ): Promise<ProductWithAuthDto> {
+    const productList = await this.productService.findProductAllByBookmark(
+      user,
+      getProductsPagebleDto.page,
+    );
+    return ProductWithAuthDto.createResponse(user, productList);
+  }
   /**
    * 상품 상세보기
    */
