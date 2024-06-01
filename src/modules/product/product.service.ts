@@ -17,7 +17,6 @@ import { ProductWithEventEntity } from './entity/ProductWithEvent.entity';
 import { ProductWithManyEventEntity } from './entity/productWithManyEvent.entity';
 
 @Injectable()
-// 프로덕트에 대한 비즈니스 로직을 담당 -> 가공까지 이어져야할 일인가?
 export class ProductService {
   constructor(
     private readonly productRepository: ProductRepository,
@@ -35,7 +34,7 @@ export class ProductService {
       this.eventRepository.getEventList(),
     ]);
 
-    return ProductWithEventEntity.create(productList, eventList);
+    return ProductWithEventEntity.createMany(productList, eventList);
   }
 
   async findProductAllBySearch(
@@ -66,7 +65,7 @@ export class ProductService {
       this.eventRepository.getEventList(productIdxList),
     ]);
 
-    return ProductWithEventEntity.create(productList, eventList);
+    return ProductWithEventEntity.createMany(productList, eventList);
   }
 
   async findProductAllByCompany(
@@ -86,7 +85,7 @@ export class ProductService {
       this.eventRepository.getEventList(productIdxList),
     ]);
 
-    return ProductWithEventEntity.create(productList, eventList);
+    return ProductWithEventEntity.createMany(productList, eventList);
   }
 
   async findProductByIdx(
@@ -108,7 +107,7 @@ export class ProductService {
     file: Express.Multer.File,
     upsertProductDto: UpsertProductDto,
   ): Promise<void> {
-    this.prismaService.$transaction(async (prisma) => {
+    await this.prismaService.$transaction(async (prisma) => {
       const url = await this.awsService.uploadImage(file);
       const { eventInfo } = upsertProductDto;
       const productIdx = await this.productRepository.insertProduct(
@@ -131,12 +130,13 @@ export class ProductService {
       await Promise.all(eventPromises);
     });
   }
+
   async amendProduct(
     file: Express.Multer.File,
     productIdx: number,
     upsertProductDto: UpsertProductDto,
   ): Promise<void> {
-    this.prismaService.$transaction(async (prisma) => {
+    await this.prismaService.$transaction(async (prisma) => {
       const url = await this.awsService.uploadImage(file);
       const { eventInfo } = upsertProductDto;
       await this.eventRepository.deleteEvent(productIdx, prisma);
@@ -162,6 +162,7 @@ export class ProductService {
       await Promise.all([...eventPromises, updateProduct]);
     });
   }
+
   async removeProduct(productIdx: number): Promise<void> {
     await this.productRepository.deleteProduct(productIdx);
   }

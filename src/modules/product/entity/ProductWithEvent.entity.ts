@@ -16,7 +16,7 @@ export class ProductWithEventEntity {
     Object.assign(this, data);
   }
 
-  public static create(
+  public static createMany(
     productList: ProductWithBookmark[],
     eventList: EventHistory[],
   ): ProductWithEventEntity[] {
