@@ -5,9 +5,6 @@ import { ProductWithEventEntity } from '../../entity/ProductWithEvent.entity';
 export class ProductWithAuthDto {
   data: ProductWithManyEventEntity | ProductWithEventEntity[];
   authStatus: 'expired' | 'false' | 'true';
-  /**
-   *  asdfasdfa
-   */
   rankIdx: number;
   constructor(datas: any) {
     Object.assign(this, datas);
