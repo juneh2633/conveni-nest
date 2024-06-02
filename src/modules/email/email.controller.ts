@@ -6,7 +6,9 @@ import { RankGuard } from 'src/common/guard/auth.guard';
 import { Rank } from 'src/common/decorator/rank.decorator';
 import { EmailCheckDto } from './dto/request/email-check.dto';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Email verifiy')
 @Controller('account/verify-email')
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
