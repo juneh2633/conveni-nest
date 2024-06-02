@@ -22,6 +22,9 @@ import { ReviewWithNicknameDto } from './dto/response/review-with-nickname.dto';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  /**
+   * 상품의 리뷰 가져오기
+   */
   @Get('/product/:productIdx')
   @AuthCheck(0)
   async findReview(
@@ -36,6 +39,9 @@ export class ReviewController {
     return ReviewWithNicknameDto.createResponse(user, reviewList);
   }
 
+  /**
+   * 상품의 리뷰 가져오기
+   */
   @Post('/product/:productIdx')
   @AuthCheck(1)
   async createReview(
