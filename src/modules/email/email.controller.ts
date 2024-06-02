@@ -2,17 +2,19 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { EmailDto } from './dto/request/email.dto';
 
-import { RankGuard } from 'src/common/guard/auth.guard';
-import { Rank } from 'src/common/decorator/rank.decorator';
 import { EmailCheckDto } from './dto/request/email-check.dto';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
 
 @ApiTags('Email verifiy')
 @Controller('account/verify-email')
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
+  /**
+   * 회원가입용 이메일 보내기
+   */
   @Post('/send')
   async sendEmailSignUp(@Body() emailDto: EmailDto): Promise<NullResponseDto> {
     await this.emailService.sendVerificationEmail({
@@ -22,9 +24,11 @@ export class EmailController {
     return new NullResponseDto();
   }
 
-  @Rank(1)
-  @UseGuards(RankGuard)
+  /**
+   * 비밀번호 복구용 이메일 보내기
+   */
   @Post('/send/recovery')
+  @AuthCheck(1)
   async sendEmailRecovery(@Body() emailDto: EmailDto) {
     await this.emailService.sendVerificationEmail({
       email: emailDto.email,
@@ -33,6 +37,9 @@ export class EmailController {
     return new NullResponseDto();
   }
 
+  /**
+   * 이메일 체크
+   */
   @Post('/check')
   async checkEmail(@Body() emailCheckDto: EmailCheckDto) {
     await this.emailService.checkVerificationEmail(
