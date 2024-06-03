@@ -32,7 +32,7 @@ export class ProductService {
     page: number,
   ): Promise<ProductWithEventEntity[]> {
     const [productList, eventList] = await Promise.all([
-      this.productRepository.getProductMany(page, user.idx),
+      this.productRepository.selectProductMany(page, user.idx),
       this.eventRepository.getEventList(),
     ]);
 
@@ -58,7 +58,7 @@ export class ProductService {
     }
     const productIdxList = possibleProductIdx.map((obj) => obj.productIdx);
     const [productList, eventList] = await Promise.all([
-      this.productRepository.getProductMany(
+      this.productRepository.selectProductMany(
         getProductsBySearchDto.page,
         user.idx,
         productIdxList,
@@ -77,13 +77,13 @@ export class ProductService {
     option: string,
   ): Promise<ProductWithEventEntity[]> {
     const possibleProductIdxList =
-      await this.productRepository.getCachedMainProductIdxList(
+      await this.productRepository.selectCachedMainProductIdxList(
         companyIdx,
         option,
       );
     const productIdxList = possibleProductIdxList.map((obj) => obj.idx);
     const [productList, eventList] = await Promise.all([
-      this.productRepository.getProductMany(page, user.idx, productIdxList),
+      this.productRepository.selectProductMany(page, user.idx, productIdxList),
       this.eventRepository.getEventList(productIdxList),
     ]);
 
@@ -95,7 +95,7 @@ export class ProductService {
       await this.bookmarkRepository.selectBookmarkAll(user.idx);
     const productIdxList = possibleProductIdxList.map((obj) => obj.idx);
     const [productList, eventList] = await Promise.all([
-      this.productRepository.getProductMany(page, user.idx, productIdxList),
+      this.productRepository.selectProductMany(page, user.idx, productIdxList),
       this.eventRepository.getEventList(productIdxList),
     ]);
 
@@ -106,7 +106,7 @@ export class ProductService {
     user: User,
   ): Promise<ProductWithManyEventEntity> {
     const [product, event] = await Promise.all([
-      this.productRepository.getProductByIdx(productIdx, user.idx),
+      this.productRepository.selectProductByIdx(productIdx, user.idx),
       this.eventRepository.getEventList([productIdx], 9),
     ]);
 

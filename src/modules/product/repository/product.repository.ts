@@ -10,7 +10,6 @@ interface Filter {
   categoryFilter?: Array<number>;
   page?: number;
 }
-///////////////////product model 프리즈마로 바꾸기
 
 @Injectable()
 export class ProductRepository {
@@ -19,7 +18,7 @@ export class ProductRepository {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async getProductMany(
+  async selectProductMany(
     page: number,
     accountIdx: number,
     productIdxList?: number[],
@@ -68,7 +67,7 @@ export class ProductRepository {
     }));
   }
 
-  async getProductByIdx(
+  async selectProductByIdx(
     productIdx: number,
     accountIdx: number,
   ): Promise<ProductWithBookmark> {
@@ -101,7 +100,7 @@ export class ProductRepository {
     };
   }
 
-  async getCachedMainProductIdxList(
+  async selectCachedMainProductIdxList(
     companyIdx: number,
     option: string,
   ): Promise<Pick<Product, 'idx'>[]> {
