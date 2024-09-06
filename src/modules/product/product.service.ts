@@ -139,7 +139,9 @@ export class ProductService {
           prisma,
         ),
       );
-
+      await this.cacheMainProduct(1);
+      await this.cacheMainProduct(2);
+      await this.cacheMainProduct(3);
       await Promise.all(eventPromises);
     });
   }
@@ -171,12 +173,22 @@ export class ProductService {
           prisma,
         ),
       );
-
+      await this.cacheMainProduct(1);
+      await this.cacheMainProduct(2);
+      await this.cacheMainProduct(3);
       await Promise.all([...eventPromises, updateProduct]);
     });
   }
 
   async removeProduct(productIdx: number): Promise<void> {
     await this.productRepository.deleteProduct(productIdx);
+    await this.cacheMainProduct(1);
+    await this.cacheMainProduct(2);
+    await this.cacheMainProduct(3);
+  }
+
+  async cacheMainProduct(companyIdx: number): Promise<void> {
+    const productCount =
+      await this.productRepository.selectProductsCountByCompany(companyIdx);
   }
 }

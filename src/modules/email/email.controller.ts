@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { EmailService } from './email.service';
 import { EmailDto } from './dto/request/email.dto';
 
@@ -6,6 +14,7 @@ import { EmailCheckDto } from './dto/request/email-check.dto';
 import { NullResponseDto } from 'src/common/dto/null-response.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
+import { ExceptionList } from 'src/common/decorator/exception-list.decorator';
 
 @ApiTags('Email verifiy')
 @Controller('account/verify-email')
@@ -16,6 +25,7 @@ export class EmailController {
    * 회원가입용 이메일 보내기
    */
   @Post('/send')
+  @ExceptionList([new UnauthorizedException('already have email')])
   async sendEmailSignUp(@Body() emailDto: EmailDto): Promise<NullResponseDto> {
     await this.emailService.sendVerificationEmail({
       email: emailDto.email,
@@ -41,6 +51,7 @@ export class EmailController {
    * 이메일 체크
    */
   @Post('/check')
+  @ExceptionList([new UnauthorizedException('not match verificationCode')])
   async checkEmail(@Body() emailCheckDto: EmailCheckDto) {
     await this.emailService.checkVerificationEmail(
       emailCheckDto.email,

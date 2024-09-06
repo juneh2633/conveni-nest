@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -50,14 +51,14 @@ export class AuthService {
     ]);
 
     if (accountCheck) {
-      throw new BadRequestException('email duplicate');
+      throw new ConflictException('email duplicate');
     }
     if (!verifiedEmail) {
       throw new ForbiddenException('not verified email');
     }
 
     if (!nicknameCheck) {
-      throw new BadRequestException('nickname duplicate');
+      throw new ConflictException('nickname duplicate');
     }
 
     await this.prisma.account.create({

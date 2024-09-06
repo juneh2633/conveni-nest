@@ -21,12 +21,14 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new HttpErrorFilter());
+
   const config = new DocumentBuilder()
     .setTitle('convenii')
     .setDescription('convenii api document')
     .addTag('convenii')
     .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

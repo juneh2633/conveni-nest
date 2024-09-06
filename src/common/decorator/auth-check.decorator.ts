@@ -20,3 +20,4 @@ export const AuthCheck = (rank: number) => {
   }
   return applyDecorators(...decorators);
 };
+ 

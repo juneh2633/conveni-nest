@@ -27,6 +27,7 @@ import { ProductService } from './product.service';
 import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
 import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiException } from 'src/common/decorator/api-exception.decorator';
+import { ExceptionList } from 'src/common/decorator/exception-list.decorator';
 
 @ApiTags('Product API')
 @Controller('product')
@@ -38,6 +39,7 @@ export class ProductController {
    */
   @Get('/all')
   @AuthCheck(0)
+  @ExceptionList([])
   async findProductList(
     @GetUser() user: User,
     @Query() pagerbleDto: GetProductsPagebleDto,

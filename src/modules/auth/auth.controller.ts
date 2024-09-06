@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  ConflictException,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/request/auth.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -8,6 +17,7 @@ import { NullResponseDto } from 'src/common/dto/null-response.dto';
 import { User } from './model/user.model';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { AuthCheck } from 'src/common/decorator/auth-check.decorator';
+import { ExceptionList } from 'src/common/decorator/exception-list.decorator';
 
 @ApiTags('Auth API')
 @Controller('account')
@@ -18,6 +28,7 @@ export class AuthController {
    * 로그인
    */
   @Post('/login')
+  @ExceptionList([new UnauthorizedException('login fail')])
   async signIn(@Body() signInDto: SignInDto): Promise<TokenResponseDto> {
     const accessToken = await this.authService.signIn(signInDto);
 
@@ -30,6 +41,11 @@ export class AuthController {
    * 회원가입
    */
   @Post('/')
+  @ExceptionList([
+    new ConflictException('email duplicate'),
+    new ForbiddenException('not verified email'),
+    new ConflictException('nickname duplicate'),
+  ])
   async signUp(@Body() signUpDto: SignUpDto): Promise<NullResponseDto> {
     await this.authService.signUp(signUpDto);
 

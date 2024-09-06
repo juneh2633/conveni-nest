@@ -113,7 +113,64 @@ export class ProductRepository {
       return { idx: idx };
     });
   }
-
+  async selectProductByCompany() {}
+  async selectProductsCountByCompany(companyIdx: number): Promise<number> {
+    const queryResult = await this.prismaService.$queryRaw`
+                WITH productInfo AS (
+                SELECT
+                    product.idx,
+                    ARRAY (
+                        SELECT
+                            json_build_object(
+                                'companyIdx', event_history.company_idx,
+                                'eventType', event_history.event_idx,
+                                'price', price
+                            )
+                        FROM
+                            event_history
+                        WHERE
+                            event_history.product_idx = product.idx
+                        AND
+                            event_history.start_date >= date_trunc('month', current_date)
+                        AND
+                            event_history.start_date < date_trunc('month', current_date) + interval '1 month'
+                        ORDER BY
+                            event_history.company_idx
+                    ) AS eventInfo,
+                    (
+                        SELECT
+                            SUM(
+                                CASE
+                                    WHEN event_history.company_idx = ${companyIdx} THEN event.priority * 2
+                                    ELSE -event.priority
+                                END
+                            )
+                        FROM
+                            event_history
+                        JOIN 
+                            event ON event_history.event_idx = event.idx
+                        WHERE          
+                            event_history.product_idx = product.idx 
+                        AND
+                            event_history.start_date >= date_trunc('month', current_date)
+                        AND
+                            event_history.start_date < date_trunc('month', current_date) + interval '1 month'
+                        GROUP BY
+                            event_history.product_idx
+                    ) AS priorityScore
+                FROM    
+                    product
+                WHERE
+                    product.deleted_at IS NULL
+            )
+            SELECT 
+                COUNT(*)
+            FROM 
+                productInfo
+            WHERE priorityScore >= 0;
+    `;
+    return queryResult[0].count;
+  }
   async insertProduct(
     categoryIdx: number,
     price: number,
